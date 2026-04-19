@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingCart, Search, Menu, X } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { useState } from 'react'
@@ -15,10 +16,15 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              PentaMerch
-            </div>
+          <Link href="/" className="flex-shrink-0 inline-flex items-center">
+            <Image
+              src="/penta-merch-logo.png"
+              alt="PentaMerch"
+              width={180}
+              height={48}
+              className="h-8 md:h-9 w-auto"
+              priority
+            />
           </Link>
 
           {/* Navigation - Desktop */}
@@ -34,6 +40,9 @@ export function Header() {
             </Link>
             <Link href="/faq" className="text-foreground hover:text-primary transition-colors">
               FAQ
+            </Link>
+            <Link href="/admin" className="text-foreground hover:text-primary transition-colors">
+              Admin
             </Link>
             <Link href="/products?category=electronics" className="text-foreground hover:text-primary transition-colors">
               Electronics
@@ -91,6 +100,9 @@ export function Header() {
             </Link>
             <Link href="/faq" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
               FAQ
+            </Link>
+            <Link href="/admin" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
+              Admin
             </Link>
             <Link href="/products?category=electronics" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
               Electronics

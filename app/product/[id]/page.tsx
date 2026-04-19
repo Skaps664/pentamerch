@@ -1,22 +1,34 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
-import { Heart, ShoppingCart, Truck, RotateCcw, Shield } from 'lucide-react'
-import { products } from '@/lib/data'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Heart,
+  ShoppingCart,
+  Truck,
+  RotateCcw,
+  Shield,
+  CheckCircle2,
+  PackageCheck,
+  Clock3,
+  ArrowRight,
+} from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { ProductCard } from '@/components/product-card'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useSiteData } from '@/lib/site-data-context'
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>()
+  const { products, productPageConfig } = useSiteData()
   const productId = Array.isArray(params?.id) ? params.id[0] : params?.id
   const product = products.find((p) => p.id === productId)
   const { addItem } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string>('')
 
   if (!product) {
     return (
@@ -34,6 +46,51 @@ export default function ProductPage() {
   const relatedProducts = products
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4)
+
+  const galleryImages = useMemo(() => {
+    const merged = [product.image, ...(product.images ?? [])].filter(Boolean)
+    return Array.from(new Set(merged))
+  }, [product])
+
+  useEffect(() => {
+    setSelectedImage(galleryImages[0] ?? product.image)
+  }, [galleryImages, product.image])
+
+  const specs = Object.entries(product.specifications ?? {})
+  const keyFeatures =
+    (product.keyFeatures ?? []).length > 0
+      ? (product.keyFeatures ?? [])
+      : specs.length > 0
+      ? specs.slice(0, 5).map(([key, value]) => `${key}: ${value}`)
+      : [
+          'Built for daily performance and long-term reliability.',
+          'Quality-checked to meet PentaMerch UK standards.',
+          'Suitable for home, office, and personal use.',
+          'Backed by responsive customer support.',
+        ]
+
+  const shippingInfo =
+    (product.shippingInfo ?? []).length > 0
+      ? (product.shippingInfo ?? [])
+      : [
+          'Dispatch from UK partner facilities on working days.',
+          'Standard delivery within 2-5 working days in the UK.',
+          'Order updates and tracking details sent by email.',
+        ]
+
+  const returnInfo =
+    (product.returnInfo ?? []).length > 0
+      ? (product.returnInfo ?? [])
+      : [
+          '30-day return policy for unused items in original condition.',
+          'Secure checkout and transaction monitoring.',
+          'UK customer support team available for post-purchase assistance.',
+        ]
+
+  const discountPercent =
+    product.originalPrice && product.originalPrice > product.price
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : 0
 
   const handleAddToCart = () => {
     addItem({
@@ -62,27 +119,44 @@ export default function ProductPage() {
 
       {/* Product Details */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          {/* Product Image */}
-          <div className="flex items-center justify-center bg-muted rounded-lg h-96 md:h-full overflow-hidden">
-            <Image
-              src={product.image}
-              alt={product.name}
-              width={500}
-              height={500}
-              className="w-full h-full object-cover"
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14">
+          <div className="lg:col-span-6 space-y-4">
+            <div className="relative overflow-hidden rounded-xl border border-border bg-muted h-[340px] sm:h-[420px] lg:h-[520px] max-w-[560px] mx-auto">
+              <Image
+                src={selectedImage || product.image}
+                alt={product.name}
+                fill
+                className="object-contain p-4"
+                sizes="(max-width: 1024px) 100vw, 46vw"
+              />
+            </div>
+
+            {galleryImages.length > 1 ? (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                {galleryImages.map((image) => (
+                  <button
+                    key={image}
+                    type="button"
+                    onClick={() => setSelectedImage(image)}
+                    className={`relative aspect-square overflow-hidden rounded-lg border transition-colors ${
+                      selectedImage === image ? 'border-primary' : 'border-border hover:border-foreground/30'
+                    }`}
+                  >
+                    <Image src={image} alt={product.name} fill className="object-cover" sizes="120px" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
-          {/* Product Info */}
-          <div>
-            <div className="mb-6">
-              <div className="flex items-start justify-between mb-4">
+          <div className="lg:col-span-6">
+            <div className="rounded-xl border border-border bg-card p-6 lg:sticky lg:top-24">
+              <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                     {product.name}
                   </h1>
-                  <p className="text-muted-foreground">{product.description}</p>
+                  <p className="text-sm text-muted-foreground">Category: {product.category}</p>
                 </div>
                 <button
                   onClick={() => setIsFavorite(!isFavorite)}
@@ -95,10 +169,8 @@ export default function ProductPage() {
                   />
                 </button>
               </div>
-            </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-4 mb-8">
+              <div className="flex items-center gap-4 mb-6">
               <div className="flex items-center gap-2">
                 {[...Array(5)].map((_, i) => (
                   <svg
@@ -118,20 +190,39 @@ export default function ProductPage() {
                 {product.rating}
               </span>
               <span className="text-muted-foreground">({product.reviews} reviews)</span>
-            </div>
+              </div>
 
-            {/* Price */}
-            <div className="mb-8">
-              <p className="text-4xl font-bold text-primary mb-2">
+              <div className="mb-6">
+                <div className="flex items-end gap-3 mb-2">
+                  <p className="text-4xl font-bold text-primary">
                 ${product.price.toFixed(2)}
               </p>
-              <p className="text-muted-foreground">
-                In stock: {product.inStock ? 'Yes' : 'No'}
-              </p>
-            </div>
+                  {product.originalPrice ? (
+                    <p className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</p>
+                  ) : null}
+                </div>
 
-            {/* Quantity & Add to Cart */}
-            <div className="mb-8">
+                {discountPercent > 0 ? (
+                  <p className="text-sm font-medium text-green-700">Save {discountPercent}% compared with list price</p>
+                ) : null}
+
+                <p className="text-sm mt-1 text-muted-foreground">
+                  Stock status: <span className="font-medium text-foreground">{product.inStock ? 'In stock' : 'Out of stock'}</span>
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-muted/60 border border-border p-4 mb-6">
+                <h3 className="text-sm font-semibold text-foreground mb-3">Key Features</h3>
+                <ul className="space-y-2">
+                  {keyFeatures.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-green-700 mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center border border-border rounded-lg">
                   <button
@@ -170,34 +261,132 @@ export default function ProductPage() {
                 <ShoppingCart className="w-5 h-5" />
                 {isAdded ? 'Added to Cart!' : product.inStock ? 'Add to Cart' : 'Out of Stock'}
               </button>
-            </div>
-
-            {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-border">
-              <div className="flex items-start gap-3">
-                <Truck className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-foreground">Free Shipping</h4>
-                  <p className="text-sm text-muted-foreground">On orders over $50</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 mt-8 border-t border-border">
+                <div className="flex items-start gap-3">
+                  <Truck className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm">UK Tracked Delivery</h4>
+                    <p className="text-xs text-muted-foreground">1-3 working days on most orders</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <RotateCcw className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-foreground">Easy Returns</h4>
-                  <p className="text-sm text-muted-foreground">30 day return policy</p>
+                <div className="flex items-start gap-3">
+                  <RotateCcw className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm">Easy Returns</h4>
+                    <p className="text-xs text-muted-foreground">30-day return window</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold text-foreground">Secure Payment</h4>
-                  <p className="text-sm text-muted-foreground">100% secure transactions</p>
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm">Secure Checkout</h4>
+                    <p className="text-xs text-muted-foreground">Encrypted payment processing</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+          <div className="lg:col-span-8 space-y-6">
+            <section className="rounded-xl border border-border bg-card p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-3">Product Description</h2>
+              <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+            </section>
+
+            <section className="rounded-xl border border-border bg-card p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Specifications</h2>
+              {specs.length > 0 ? (
+                <div className="space-y-2">
+                  {specs.map(([key, value]) => (
+                    <div key={key} className="grid grid-cols-2 gap-4 border-b border-border/70 pb-2 last:border-0 last:pb-0">
+                      <p className="text-sm font-medium text-foreground">{key}</p>
+                      <p className="text-sm text-muted-foreground">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Detailed specifications will appear here when configured in admin.</p>
+              )}
+            </section>
+          </div>
+
+          <aside className="lg:col-span-4 space-y-6">
+            <section className="rounded-xl border border-border bg-card p-5">
+              <h3 className="text-lg font-semibold text-foreground mb-3">Shipping Information</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                {shippingInfo.map((line, index) => (
+                  <li key={`${line}-${index}`} className="flex items-start gap-2">
+                    {index === 0 ? (
+                      <PackageCheck className="w-4 h-4 mt-0.5 text-primary" />
+                    ) : index === 1 ? (
+                      <Truck className="w-4 h-4 mt-0.5 text-primary" />
+                    ) : (
+                      <Clock3 className="w-4 h-4 mt-0.5 text-primary" />
+                    )}
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="rounded-xl border border-border bg-card p-5">
+              <h3 className="text-lg font-semibold text-foreground mb-3">Returns & Buyer Protection</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                {returnInfo.map((line, index) => (
+                  <li key={`${line}-${index}`} className="flex items-start gap-2">
+                    {index === 0 ? (
+                      <RotateCcw className="w-4 h-4 mt-0.5 text-primary" />
+                    ) : index === 1 ? (
+                      <Shield className="w-4 h-4 mt-0.5 text-primary" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 mt-0.5 text-primary" />
+                    )}
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </aside>
+        </div>
+
+        {productPageConfig.detailBanner.enabled ? (
+          <section className="mb-14">
+            <div className="relative overflow-hidden rounded-xl border border-border min-h-[220px] md:min-h-[260px]">
+              {productPageConfig.detailBanner.image ? (
+                <Image
+                  src={productPageConfig.detailBanner.image}
+                  alt={productPageConfig.detailBanner.title || 'Promotional banner'}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-700" />
+              )}
+
+              <div className="absolute inset-0 bg-black/45" />
+
+              <div className="relative z-10 p-6 md:p-10 max-w-3xl">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                  {productPageConfig.detailBanner.title || 'Explore more from this collection'}
+                </h2>
+                <p className="text-white/90 text-sm md:text-base mb-6">
+                  {productPageConfig.detailBanner.text || 'Discover more options selected for UK shoppers.'}
+                </p>
+                <Link
+                  href={productPageConfig.detailBanner.linkHref || '/products'}
+                  className="inline-flex items-center gap-2 rounded-md bg-white text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-slate-100"
+                >
+                  {productPageConfig.detailBanner.linkText || 'Shop More'}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (

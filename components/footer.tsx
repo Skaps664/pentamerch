@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 
 export function Footer() {
@@ -10,7 +11,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">PentaMerch</h3>
+            <Link href="/" className="inline-flex items-center mb-4 rounded-lg bg-white/95 px-3 py-2 shadow-sm ring-1 ring-white/40">
+              <Image
+                src="/penta-merch-logo.png"
+                alt="PentaMerch"
+                width={180}
+                height={48}
+                className="h-9 w-auto"
+              />
+            </Link>
             <p className="text-sm opacity-90">
               PentaMerch is a UK-first ecommerce destination for premium electronics, fashion, lifestyle and home essentials.
             </p>
@@ -93,7 +102,9 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground border-opacity-20 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-            <p>&copy; {currentYear} PentaMerch. All rights reserved.</p>
+            <p>&copy; {currentYear} PentaMerch. All rights reserved. Made by them <a href="https://skordlabs.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
+              skordlabs
+            </a></p>
             <div className="flex gap-6">
               <Link href="/privacy-policy" className="hover:opacity-80 transition-opacity">
                 Privacy Policy

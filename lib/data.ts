@@ -13,6 +13,9 @@ export interface Product {
   isBestseller: boolean;
   images?: string[];
   specifications?: Record<string, string>;
+  keyFeatures?: string[];
+  shippingInfo?: string[];
+  returnInfo?: string[];
 }
 
 export interface Category {

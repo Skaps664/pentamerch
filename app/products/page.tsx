@@ -1,25 +1,34 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ProductCard } from '@/components/product-card'
-import { products, categories } from '@/lib/data'
+import { useSiteData } from '@/lib/site-data-context'
 import { ChevronDown } from 'lucide-react'
 
-export default function ProductsPage({
-  searchParams,
-}: {
-  searchParams: { category?: string; sort?: string; search?: string }
-}) {
-  const [sortBy, setSortBy] = useState<string>(searchParams.sort || 'featured')
+export default function ProductsPage() {
+  const { products, categories } = useSiteData()
+
+  const [sortBy, setSortBy] = useState<string>('featured')
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    searchParams.category || ''
-  )
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setSortBy(params.get('sort') || 'featured')
+    setSelectedCategory(params.get('category') || '')
+  }, [])
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
-      const matchesCategory = !selectedCategory || product.category === selectedCategory
+      const matchesCategory =
+        !selectedCategory ||
+        product.category === selectedCategory ||
+        categories.some(
+          (category) =>
+            category.id === selectedCategory &&
+            (product.category === category.id || product.category === category.slug)
+        )
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1]
       return matchesCategory && matchesPrice
     })
@@ -44,7 +53,7 @@ export default function ProductsPage({
     }
 
     return filtered
-  }, [selectedCategory, sortBy, priceRange])
+  }, [selectedCategory, sortBy, priceRange, products, categories])
 
   return (
     <div className="min-h-screen bg-background">
