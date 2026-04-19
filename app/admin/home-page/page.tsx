@@ -268,6 +268,7 @@ function BannerEditor({
     ctaText: string
     ctaHref: string
     background: string
+    image: string
   }
   onChange: (value: {
     enabled: boolean
@@ -276,6 +277,7 @@ function BannerEditor({
     ctaText: string
     ctaHref: string
     background: string
+    image: string
   }) => void
 }) {
   return (
@@ -297,6 +299,20 @@ function BannerEditor({
         <input className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2" value={value.subtitle} onChange={(e) => onChange({ ...value, subtitle: e.target.value })} placeholder="Subtitle" />
         <input className="rounded-md border border-slate-300 px-3 py-2 text-sm" value={value.ctaHref} onChange={(e) => onChange({ ...value, ctaHref: e.target.value })} placeholder="CTA Link" />
         <input className="rounded-md border border-slate-300 px-3 py-2 text-sm" value={value.background} onChange={(e) => onChange({ ...value, background: e.target.value })} placeholder="Tailwind background class" />
+        <input className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2" value={value.image} onChange={(e) => onChange({ ...value, image: e.target.value })} placeholder="Banner Image URL" />
+        <input
+          type="file"
+          accept="image/*"
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
+          onChange={async (e) => {
+            const file = e.target.files?.[0]
+            if (!file) {
+              return
+            }
+            const image = await toDataUrl(file)
+            onChange({ ...value, image })
+          }}
+        />
       </div>
     </div>
   )

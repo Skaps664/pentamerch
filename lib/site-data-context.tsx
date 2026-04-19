@@ -38,6 +38,7 @@ export interface HomePageConfig {
     ctaText: string
     ctaHref: string
     background: string
+    image: string
   }
   bestSellers: {
     enabled: boolean
@@ -61,6 +62,7 @@ export interface HomePageConfig {
     ctaText: string
     ctaHref: string
     background: string
+    image: string
   }
   trending: {
     enabled: boolean
@@ -109,9 +111,9 @@ const defaultHomeConfig: HomePageConfig = {
     ctaText: 'Shop Now',
     ctaHref: '/products',
     slides: [
-      'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1600&h=900&fit=crop',
-      'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&h=900&fit=crop',
-      'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600&h=900&fit=crop',
+      'https://images.unsplash.com/photo-1470309864661-68328b2cd0a5?w=1600&h=900&fit=crop',
     ],
   },
   featured: {
@@ -127,6 +129,7 @@ const defaultHomeConfig: HomePageConfig = {
     ctaText: 'Shop Collections',
     ctaHref: '/products',
     background: 'bg-gradient-to-r from-primary to-primary/80',
+    image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1600&h=900&fit=crop',
   },
   bestSellers: {
     enabled: true,
@@ -154,6 +157,7 @@ const defaultHomeConfig: HomePageConfig = {
     ctaText: 'Shop Sale',
     ctaHref: '/products',
     background: 'bg-gradient-to-r from-accent to-accent/80',
+    image: 'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1600&h=900&fit=crop',
   },
   trending: {
     enabled: true,
@@ -164,10 +168,10 @@ const defaultHomeConfig: HomePageConfig = {
 
 const defaultProductPageConfig: ProductPageConfig = {
   detailBanner: {
-    enabled: false,
+    enabled: true,
     title: 'Explore More at PentaMerch',
     text: 'Discover more standout products from our curated collection.',
-    image: '',
+    image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=1600&h=700&fit=crop',
     linkText: 'Shop Collections',
     linkHref: '/products',
   },
@@ -178,6 +182,84 @@ const defaultState: SiteDataState = {
   categories: defaultCategories,
   homeConfig: defaultHomeConfig,
   productPageConfig: defaultProductPageConfig,
+}
+
+const IMAGE_URL_MIGRATION: Record<string, string> = {
+  'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1600&h=900&fit=crop': 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=900&fit=crop',
+  'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&h=900&fit=crop': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600&h=900&fit=crop',
+  'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1600&h=900&fit=crop': 'https://images.unsplash.com/photo-1470309864661-68328b2cd0a5?w=1600&h=900&fit=crop',
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1525261741207-4b6f9a891e11?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1493666438817-866a91353ca9?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1517836357463-d25ddfcb70ff?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1507842217343-583f20270319?w=400&h=400&fit=crop': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1577174881658-0f30ed549adc?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1545127398-14699f92334b?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1588872657840-790ff3bde1b6?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1591028171603-e14f2c4d2bef?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1593032465171-8bd017db2a98?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1591291621164-2c6367723315?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1507842217343-583f20270319?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1558089687-f282ffcbc0d4?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1527443195645-1133f7f28990?w=500&h=500&fit=crop',
+  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop': 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=500&h=500&fit=crop',
+}
+
+function migrateImageUrl(url: string): string {
+  return IMAGE_URL_MIGRATION[url] ?? url
+}
+
+function migrateProduct(product: Product): Product {
+  return {
+    ...product,
+    image: migrateImageUrl(product.image),
+    images: product.images?.map(migrateImageUrl),
+  }
+}
+
+function migrateCategory(category: Category): Category {
+  return {
+    ...category,
+    image: migrateImageUrl(category.image),
+  }
+}
+
+function migrateHomeConfig(config: HomePageConfig): HomePageConfig {
+  return {
+    ...config,
+    hero: {
+      ...config.hero,
+      slides: config.hero.slides.map(migrateImageUrl),
+    },
+    bannerOne: {
+      ...config.bannerOne,
+      image: migrateImageUrl(config.bannerOne.image || defaultHomeConfig.bannerOne.image),
+    },
+    bannerTwo: {
+      ...config.bannerTwo,
+      image: migrateImageUrl(config.bannerTwo.image || defaultHomeConfig.bannerTwo.image),
+    },
+  }
+}
+
+function migrateProductPageConfig(config: ProductPageConfig): ProductPageConfig {
+  return {
+    ...config,
+    detailBanner: {
+      ...config.detailBanner,
+      enabled: true,
+      image: migrateImageUrl(config.detailBanner.image),
+    },
+  }
 }
 
 const SiteDataContext = createContext<SiteDataContextValue | null>(null)
@@ -204,11 +286,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<SiteDataState>
         setState({
-          products: parsed.products ?? defaultState.products,
-          categories: parsed.categories ?? defaultState.categories,
-          homeConfig: parsed.homeConfig ?? defaultState.homeConfig,
-          productPageConfig:
-            parsed.productPageConfig ?? defaultState.productPageConfig,
+          products: (parsed.products ?? defaultState.products).map(migrateProduct),
+          categories: (parsed.categories ?? defaultState.categories).map(migrateCategory),
+          homeConfig: migrateHomeConfig(parsed.homeConfig ?? defaultState.homeConfig),
+          productPageConfig: migrateProductPageConfig(
+            parsed.productPageConfig ?? defaultState.productPageConfig
+          ),
         })
       }
     } catch {

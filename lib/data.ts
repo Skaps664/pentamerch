@@ -31,42 +31,42 @@ export const categories: Category[] = [
     id: "electronics",
     name: "Electronics",
     slug: "electronics",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop",
     description: "Latest gadgets and devices"
   },
   {
     id: "fashion",
     name: "Fashion",
     slug: "fashion",
-    image: "https://images.unsplash.com/photo-1525261741207-4b6f9a891e11?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop",
     description: "Trending clothing and accessories"
   },
   {
     id: "home",
     name: "Home & Living",
     slug: "home",
-    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?w=400&h=400&fit=crop",
     description: "Furniture and home essentials"
   },
   {
     id: "beauty",
     name: "Beauty & Care",
     slug: "beauty",
-    image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
     description: "Skincare and beauty products"
   },
   {
     id: "sports",
     name: "Sports & Fitness",
     slug: "sports",
-    image: "https://images.unsplash.com/photo-1517836357463-d25ddfcb70ff?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&h=400&fit=crop",
     description: "Sports equipment and fitness gear"
   },
   {
     id: "books",
     name: "Books & Media",
     slug: "books",
-    image: "https://images.unsplash.com/photo-1507842217343-583f20270319?w=400&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop",
     description: "Books, ebooks, and media"
   }
 ];
@@ -79,16 +79,16 @@ export const products: Product[] = [
     originalPrice: 399.99,
     description: "High-quality wireless headphones with noise cancellation and 30-hour battery life",
     category: "electronics",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?w=500&h=500&fit=crop",
     rating: 4.8,
     reviews: 2543,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?w=500&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?w=500&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1545127398-14699f92334b?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Driver Size": "40mm",
@@ -104,15 +104,15 @@ export const products: Product[] = [
     originalPrice: 1599.99,
     description: "Lightweight laptop with powerful processor and stunning display",
     category: "electronics",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop",
     rating: 4.7,
     reviews: 1823,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1588872657840-790ff3bde1b6?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Processor": "Intel Core i7",
@@ -128,15 +128,15 @@ export const products: Product[] = [
     originalPrice: 299.99,
     description: "Elegant blazer perfect for office or casual wear",
     category: "fashion",
-    image: "https://images.unsplash.com/photo-1591028171603-e14f2c4d2bef?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1593032465171-8bd017db2a98?w=500&h=500&fit=crop",
     rating: 4.6,
     reviews: 892,
     inStock: true,
     isFeatured: true,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1591028171603-e14f2c4d2bef?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1593032465171-8bd017db2a98?w=500&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Material": "100% Wool",
@@ -151,15 +151,15 @@ export const products: Product[] = [
     originalPrice: 179.99,
     description: "Complete skincare routine with natural ingredients",
     category: "beauty",
-    image: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=500&h=500&fit=crop",
     rating: 4.9,
     reviews: 3421,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=500&fit=crop",
-      "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=500&h=500&fit=crop",
+      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Items": "5 pieces",
@@ -174,14 +174,14 @@ export const products: Product[] = [
     originalPrice: 599.99,
     description: "Modern wooden coffee table with clean lines",
     category: "home",
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=500&h=500&fit=crop",
     rating: 4.5,
     reviews: 654,
     inStock: true,
     isFeatured: false,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Material": "Walnut Wood",
@@ -196,14 +196,14 @@ export const products: Product[] = [
     originalPrice: 1199.99,
     description: "High-resolution DSLR camera for professionals",
     category: "electronics",
-    image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&h=500&fit=crop",
     rating: 4.7,
     reviews: 1234,
     inStock: true,
     isFeatured: false,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Megapixels": "42MP",
@@ -218,14 +218,14 @@ export const products: Product[] = [
     originalPrice: 79.99,
     description: "Non-slip yoga mat with extra cushioning",
     category: "sports",
-    image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1591291621164-2c6367723315?w=500&h=500&fit=crop",
     rating: 4.6,
     reviews: 1523,
     inStock: true,
     isFeatured: true,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1591291621164-2c6367723315?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Thickness": "6mm",
@@ -240,14 +240,14 @@ export const products: Product[] = [
     originalPrice: 59.99,
     description: "Collection of top-rated bestselling novels",
     category: "books",
-    image: "https://images.unsplash.com/photo-1507842217343-583f20270319?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&h=500&fit=crop",
     rating: 4.8,
     reviews: 2341,
     inStock: true,
     isFeatured: false,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1507842217343-583f20270319?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Format": "Hardcover",
@@ -262,14 +262,14 @@ export const products: Product[] = [
     originalPrice: 499.99,
     description: "Elegant stainless steel watch with automatic movement",
     category: "fashion",
-    image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&h=500&fit=crop",
     rating: 4.9,
     reviews: 987,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Material": "Stainless Steel",
@@ -284,14 +284,14 @@ export const products: Product[] = [
     originalPrice: 179.99,
     description: "Control all your smart devices with one hub",
     category: "electronics",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1558089687-f282ffcbc0d4?w=500&h=500&fit=crop",
     rating: 4.7,
     reviews: 1654,
     inStock: true,
     isFeatured: false,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1558089687-f282ffcbc0d4?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Compatibility": "All Major Brands",
@@ -306,14 +306,14 @@ export const products: Product[] = [
     originalPrice: 299.99,
     description: "Track your fitness goals with advanced sensors",
     category: "sports",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&h=500&fit=crop",
     rating: 4.6,
     reviews: 2156,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Display": "AMOLED",
@@ -328,14 +328,14 @@ export const products: Product[] = [
     originalPrice: 199.99,
     description: "Premium fragrance with exotic notes",
     category: "beauty",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500&h=500&fit=crop",
     rating: 4.8,
     reviews: 876,
     inStock: true,
     isFeatured: false,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Volume": "100ml",
@@ -350,14 +350,14 @@ export const products: Product[] = [
     originalPrice: 549.99,
     description: "Ergonomic office chair with lumbar support",
     category: "home",
-    image: "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?w=500&h=500&fit=crop",
     rating: 4.7,
     reviews: 1432,
     inStock: true,
     isFeatured: false,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Material": "Mesh & Leather",
@@ -372,14 +372,14 @@ export const products: Product[] = [
     originalPrice: 749.99,
     description: "Stunning 4K display for professionals",
     category: "electronics",
-    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1527443195645-1133f7f28990?w=500&h=500&fit=crop",
     rating: 4.8,
     reviews: 1087,
     inStock: true,
     isFeatured: true,
     isBestseller: false,
     images: [
-      "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1527443195645-1133f7f28990?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Size": "32 inch",
@@ -394,14 +394,14 @@ export const products: Product[] = [
     originalPrice: 179.99,
     description: "Lightweight running shoes with excellent cushioning",
     category: "sports",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=500&h=500&fit=crop",
     rating: 4.7,
     reviews: 2876,
     inStock: true,
     isFeatured: true,
     isBestseller: true,
     images: [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop"
+      "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=500&h=500&fit=crop"
     ],
     specifications: {
       "Material": "Mesh & Synthetic",

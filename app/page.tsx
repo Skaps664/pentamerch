@@ -78,6 +78,7 @@ export default function Home() {
           title={homeConfig.bannerOne.title}
           subtitle={homeConfig.bannerOne.subtitle}
           cta={{ text: homeConfig.bannerOne.ctaText, href: homeConfig.bannerOne.ctaHref }}
+          slides={homeConfig.bannerOne.image ? [homeConfig.bannerOne.image] : undefined}
           background={homeConfig.bannerOne.background}
           dark={true}
         />
@@ -160,6 +161,7 @@ export default function Home() {
           title={homeConfig.bannerTwo.title}
           subtitle={homeConfig.bannerTwo.subtitle}
           cta={{ text: homeConfig.bannerTwo.ctaText, href: homeConfig.bannerTwo.ctaHref }}
+          slides={homeConfig.bannerTwo.image ? [homeConfig.bannerTwo.image] : undefined}
           background={homeConfig.bannerTwo.background}
           dark={true}
         />
