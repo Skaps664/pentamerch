@@ -35,21 +35,16 @@ export function Header() {
             <Link href="/products" className="text-foreground hover:text-primary transition-colors">
               Products
             </Link>
-            <Link href="/contact-us" className="text-foreground hover:text-primary transition-colors">
-              Contact
-            </Link>
-            <Link href="/faq" className="text-foreground hover:text-primary transition-colors">
-              FAQ
-            </Link>
-            <Link href="/admin" className="text-foreground hover:text-primary transition-colors">
-              Admin
-            </Link>
             <Link href="/products?category=electronics" className="text-foreground hover:text-primary transition-colors">
               Electronics
             </Link>
             <Link href="/products?category=fashion" className="text-foreground hover:text-primary transition-colors">
               Fashion
             </Link>
+            <Link href="/contact-us" className="text-foreground hover:text-primary transition-colors">
+              Contact
+            </Link>
+            
           </nav>
 
           {/* Right Actions */}
@@ -89,27 +84,17 @@ export function Header() {
             <Link href="/products" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
               Products
             </Link>
-            <Link href="/contact-us" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Contact Us
-            </Link>
-            <Link href="/shipping-info" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Shipping Info
-            </Link>
-            <Link href="/returns" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Returns
-            </Link>
-            <Link href="/faq" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              FAQ
-            </Link>
-            <Link href="/admin" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Admin
-            </Link>
             <Link href="/products?category=electronics" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
               Electronics
             </Link>
             <Link href="/products?category=fashion" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
               Fashion
             </Link>
+            <Link href="/contact-us" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
+              Contact Us
+            </Link>
+            
+            
           </nav>
         )}
       </div>
