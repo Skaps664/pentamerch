@@ -173,7 +173,7 @@ export default function AdminHomePageSettings() {
 
       <div className="rounded-lg border border-slate-300 bg-white p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900">Why UK Shoppers Select Section</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Why Customers Choose Section</h3>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input
               type="checkbox"

@@ -32,9 +32,9 @@ export default function Home() {
 
   const trustHighlights = [
     {
-      title: 'Fast UK Delivery',
-      description: 'Tracked shipping from our UK distribution partners.',
-      kicker: 'Tracked & Reliable',
+      title: 'Fast Delivery',
+      description: 'Tracked shipping through trusted fulfilment partners.',
+      kicker: 'Reliable Fulfilment',
       icon: Truck,
     },
     {
@@ -45,8 +45,8 @@ export default function Home() {
     },
     {
       title: 'Easy Returns',
-      description: 'Straightforward returns under UK consumer law.',
-      kicker: 'Clear Return Windows',
+      description: 'Straightforward return process with clear timelines.',
+      kicker: 'Clear Return Policy',
       icon: RotateCcw,
     },
     {

@@ -374,7 +374,7 @@ export default function ProductPage() {
                   {productPageConfig.detailBanner.title || 'Explore more from this collection'}
                 </h2>
                 <p className="text-white/90 text-sm md:text-base mb-6">
-                  {productPageConfig.detailBanner.text || 'Discover more options selected for UK shoppers.'}
+                  {productPageConfig.detailBanner.text || 'Discover more options from our curated collection.'}
                 </p>
                 <Link
                   href={productPageConfig.detailBanner.linkHref || '/products'}

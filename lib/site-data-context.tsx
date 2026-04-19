@@ -105,7 +105,7 @@ const defaultHomeConfig: HomePageConfig = {
     enabled: true,
     title: 'Welcome to PentaMerch',
     subtitle:
-      'Premium products for modern UK shoppers across electronics, fashion, home, beauty and more.',
+      'A curated collection of premium products across electronics, fashion, home, beauty, and more.',
     ctaText: 'Shop Now',
     ctaHref: '/products',
     slides: [
@@ -138,10 +138,10 @@ const defaultHomeConfig: HomePageConfig = {
   },
   trust: {
     enabled: true,
-    eyebrow: 'Shop With Confidence',
-    title: 'Why UK Shoppers Select PentaMerch',
+    eyebrow: 'Trusted Shopping Experience',
+    title: 'Why Customers Choose PentaMerch',
     subtitle:
-      'Clear policies, secure payments, and dependable delivery from a UK-first ecommerce experience.',
+      'Clear policies, secure payments, and dependable delivery from a store built for long-term trust.',
   },
   categories: {
     enabled: true,
@@ -166,7 +166,7 @@ const defaultProductPageConfig: ProductPageConfig = {
   detailBanner: {
     enabled: false,
     title: 'Explore More at PentaMerch',
-    text: 'Discover more products selected for UK shoppers.',
+    text: 'Discover more standout products from our curated collection.',
     image: '',
     linkText: 'Shop Collections',
     linkHref: '/products',

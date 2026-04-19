@@ -21,7 +21,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-sm opacity-90">
-              PentaMerch is a UK-first ecommerce destination for premium electronics, fashion, lifestyle and home essentials.
+              PentaMerch is a modern online store for quality electronics, fashion, lifestyle, and home essentials.
             </p>
           </div>
 

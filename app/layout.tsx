@@ -11,8 +11,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'PentaMerch UK | Premium Ecommerce Store',
-  description: 'Shop premium products at PentaMerch across electronics, fashion, home and more',
+  title: 'PentaMerch | Premium Online Store',
+  description: 'Shop premium products at PentaMerch across electronics, fashion, home, and more.',
   generator: 'v0.app',
   icons: {
     icon: '/penta-merch-fav.png',
