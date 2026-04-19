@@ -1,0 +1,113 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ProductCard } from './product-card'
+
+interface Product {
+  id: string
+  name: string
+  price: number
+  image: string
+  rating: number
+  reviews: number
+  badge?: string
+}
+
+interface ProductCarouselProps {
+  title: string
+  products: Product[]
+}
+
+export function ProductCarousel({ title, products }: ProductCarouselProps) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [itemsPerView, setItemsPerView] = useState(4)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerView(2)
+      } else if (window.innerWidth < 1024) {
+        setItemsPerView(2)
+      } else if (window.innerWidth < 1536) {
+        setItemsPerView(3)
+      } else {
+        setItemsPerView(4)
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const totalSlides = Math.ceil(products.length / itemsPerView)
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % totalSlides)
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides)
+  }
+
+  const displayedProducts = products.slice(
+    currentIndex * itemsPerView,
+    (currentIndex + 1) * itemsPerView
+  )
+
+  return (
+    <section className="py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            {title}
+          </h2>
+          <div className="flex gap-2">
+            <button
+              onClick={prevSlide}
+              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Carousel */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          {displayedProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              {...product}
+            />
+          ))}
+        </div>
+
+        {/* Indicators */}
+        <div className="flex justify-center gap-2 mt-10">
+          {Array.from({ length: totalSlides }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-2 rounded-full transition-all ${
+                index === currentIndex
+                  ? 'bg-primary w-8'
+                  : 'bg-border w-2 hover:bg-muted-foreground'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
