@@ -17,6 +17,20 @@ import {
 
 const STORAGE_KEY = 'pentamerch-admin-data-v1'
 
+export interface NavItem {
+  id: string
+  label: string
+  href: string
+}
+
+export const NAVBAR_PAGE_OPTIONS: NavItem[] = [
+  { id: 'home', label: 'Home', href: '/' },
+  { id: 'all-products', label: 'All Products', href: '/products' },
+  { id: 'electronics', label: 'Electronics', href: '/products?category=electronics' },
+  { id: 'fashion', label: 'Fashion', href: '/products?category=fashion' },
+  { id: 'contact', label: 'Contact', href: '/contact-us' },
+]
+
 export interface HomePageConfig {
   hero: {
     enabled: boolean
@@ -87,12 +101,14 @@ interface SiteDataState {
   categories: Category[]
   homeConfig: HomePageConfig
   productPageConfig: ProductPageConfig
+  navItems: NavItem[]
 }
 
 interface SiteDataContextValue extends SiteDataState {
   hydrated: boolean
   setHomeConfig: (config: HomePageConfig) => void
   setProductPageConfig: (config: ProductPageConfig) => void
+  setNavItems: (items: NavItem[]) => void
   createCategory: (payload: Omit<Category, 'id'> & { id?: string }) => void
   updateCategory: (id: string, payload: Partial<Category>) => void
   deleteCategory: (id: string) => void
@@ -182,6 +198,7 @@ const defaultState: SiteDataState = {
   categories: defaultCategories,
   homeConfig: defaultHomeConfig,
   productPageConfig: defaultProductPageConfig,
+  navItems: NAVBAR_PAGE_OPTIONS,
 }
 
 const IMAGE_URL_MIGRATION: Record<string, string> = {
@@ -262,6 +279,32 @@ function migrateProductPageConfig(config: ProductPageConfig): ProductPageConfig 
   }
 }
 
+function migrateNavItems(items?: NavItem[]): NavItem[] {
+  if (!Array.isArray(items)) {
+    return NAVBAR_PAGE_OPTIONS
+  }
+
+  const optionsById = new Map(NAVBAR_PAGE_OPTIONS.map((item) => [item.id, item]))
+  const seen = new Set<string>()
+  const nextItems: NavItem[] = []
+
+  for (const item of items) {
+    if (!item || typeof item.id !== 'string' || seen.has(item.id)) {
+      continue
+    }
+
+    const option = optionsById.get(item.id)
+    if (!option) {
+      continue
+    }
+
+    seen.add(item.id)
+    nextItems.push(option)
+  }
+
+  return nextItems.length > 0 ? nextItems : NAVBAR_PAGE_OPTIONS
+}
+
 const SiteDataContext = createContext<SiteDataContextValue | null>(null)
 
 function getNextNumericId(values: string[]): string {
@@ -292,6 +335,7 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
           productPageConfig: migrateProductPageConfig(
             parsed.productPageConfig ?? defaultState.productPageConfig
           ),
+          navItems: migrateNavItems(parsed.navItems),
         })
       }
     } catch {
@@ -317,6 +361,9 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     setProductPageConfig: (config) => {
       setState((prev) => ({ ...prev, productPageConfig: config }))
+    },
+    setNavItems: (items) => {
+      setState((prev) => ({ ...prev, navItems: migrateNavItems(items) }))
     },
     createCategory: (payload) => {
       setState((prev) => {

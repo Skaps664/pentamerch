@@ -21,15 +21,14 @@ interface ProductCarouselProps {
 
 export function ProductCarousel({ title, products }: ProductCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [itemsPerView, setItemsPerView] = useState(4)
+  const [itemsPerView, setItemsPerView] = useState(3)
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setItemsPerView(2)
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(2)
-      } else if (window.innerWidth < 1536) {
+      setIsDesktop(window.innerWidth >= 1024)
+
+      if (window.innerWidth < 1536) {
         setItemsPerView(3)
       } else {
         setItemsPerView(4)
@@ -51,10 +50,16 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
     setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides)
   }
 
-  const displayedProducts = products.slice(
-    currentIndex * itemsPerView,
-    (currentIndex + 1) * itemsPerView
-  )
+  const displayedProducts = isDesktop
+    ? products.slice(
+        currentIndex * itemsPerView,
+        (currentIndex + 1) * itemsPerView
+      )
+    : products
+
+  useEffect(() => {
+    setCurrentIndex(0)
+  }, [itemsPerView, products.length, isDesktop])
 
   return (
     <section className="py-12 md:py-16">
@@ -64,49 +69,67 @@ export function ProductCarousel({ title, products }: ProductCarouselProps) {
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
             {title}
           </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={prevSlide}
-              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+          {isDesktop ? (
+            <div className="flex gap-2">
+              <button
+                onClick={prevSlide}
+                className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Swipe</p>
+          )}
         </div>
 
         {/* Carousel */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-          {displayedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              {...product}
-            />
-          ))}
-        </div>
+        {isDesktop ? (
+          <div className="grid grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {displayedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                {...product}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex gap-4 snap-x snap-mandatory touch-pan-x">
+              {displayedProducts.map((product) => (
+                <div key={product.id} className="snap-start min-w-[72%] sm:min-w-[42%]">
+                  <ProductCard {...product} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Indicators */}
-        <div className="flex justify-center gap-2 mt-10">
-          {Array.from({ length: totalSlides }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex
-                  ? 'bg-primary w-8'
-                  : 'bg-border w-2 hover:bg-muted-foreground'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+        {isDesktop ? (
+          <div className="flex justify-center gap-2 mt-10">
+            {Array.from({ length: totalSlides }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-2 rounded-full transition-all ${
+                  index === currentIndex
+                    ? 'bg-primary w-8'
+                    : 'bg-border w-2 hover:bg-muted-foreground'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   )

@@ -15,9 +15,9 @@ export function Footer() {
               <Image
                 src="/penta-merch-logo.png"
                 alt="PentaMerch"
-                width={180}
-                height={48}
-                className="h-9 w-auto"
+                width={220}
+                height={60}
+                className="h-12 w-auto"
               />
             </Link>
             <p className="text-sm opacity-90">

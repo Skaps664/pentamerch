@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard' },
@@ -8,6 +11,16 @@ const navItems = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  const isActiveTab = (href: string) => {
+    if (href === '/admin') {
+      return pathname === '/admin'
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
+
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -25,7 +38,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                      className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        isActiveTab(item.href)
+                          ? 'bg-slate-900 text-white hover:bg-slate-800'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                      aria-current={isActiveTab(item.href) ? 'page' : undefined}
                     >
                       {item.label}
                     </Link>

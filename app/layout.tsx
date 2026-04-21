@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { CartProvider } from '@/lib/cart-context'
+import { AuthProvider } from '@/lib/auth-context'
 import { SiteDataProvider } from '@/lib/site-data-context'
 import './globals.css'
 
@@ -29,13 +30,15 @@ export default function RootLayout({
     <html lang="en" className="bg-background">
       <body className="font-sans antialiased">
         <SiteDataProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </CartProvider>
+          </AuthProvider>
         </SiteDataProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

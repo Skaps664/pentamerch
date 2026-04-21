@@ -1,13 +1,37 @@
 'use client'
 
 import Link from 'next/link'
-import { useSiteData } from '@/lib/site-data-context'
+import { useEffect, useState } from 'react'
+import { NAVBAR_PAGE_OPTIONS, useSiteData } from '@/lib/site-data-context'
 
 export default function AdminDashboardPage() {
-  const { products, categories, homeConfig } = useSiteData()
+  const { products, categories, homeConfig, navItems, setNavItems } = useSiteData()
+  const [selectedNavIds, setSelectedNavIds] = useState<string[]>(navItems.map((item) => item.id))
+  const [savedNav, setSavedNav] = useState(false)
 
   const totalInStock = products.filter((item) => item.inStock).length
   const featuredCount = products.filter((item) => item.isFeatured).length
+
+  useEffect(() => {
+    setSelectedNavIds(navItems.map((item) => item.id))
+  }, [navItems])
+
+  const toggleNavItem = (id: string) => {
+    setSelectedNavIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
+  }
+
+  const saveNavbarItems = () => {
+    const nextItems = NAVBAR_PAGE_OPTIONS.filter((item) => selectedNavIds.includes(item.id))
+    if (nextItems.length === 0) {
+      return
+    }
+
+    setNavItems(nextItems)
+    setSavedNav(true)
+    window.setTimeout(() => setSavedNav(false), 1800)
+  }
 
   return (
     <div className="space-y-6">
@@ -59,6 +83,39 @@ export default function AdminDashboardPage() {
           <Link href="/admin/products" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100">
             Manage Products
           </Link>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-slate-300 bg-white p-6 space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">Navbar Links</h3>
+          <p className="text-sm text-slate-600 mt-1">Select which pages should appear in the storefront header navigation.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {NAVBAR_PAGE_OPTIONS.map((item) => (
+            <label key={item.id} className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={selectedNavIds.includes(item.id)}
+                onChange={() => toggleNavItem(item.id)}
+              />
+              {item.label}
+            </label>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={saveNavbarItems}
+            disabled={selectedNavIds.length === 0}
+            className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            Save Navbar Links
+          </button>
+          {selectedNavIds.length === 0 ? <p className="text-sm text-red-700">Select at least one page.</p> : null}
+          {savedNav ? <p className="text-sm text-green-700">Navbar links updated.</p> : null}
         </div>
       </div>
     </div>

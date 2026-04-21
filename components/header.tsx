@@ -2,14 +2,19 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Search, Menu, X } from 'lucide-react'
+import { ShoppingCart, User, Menu, X } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 import { useCart } from '@/lib/cart-context'
+import { useSiteData } from '@/lib/site-data-context'
 import { useState } from 'react'
 
 export function Header() {
   const { items } = useCart()
+  const { navItems } = useSiteData()
+  const { user, getUserSlug } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  const profileLink = user && getUserSlug() ? `/user/${getUserSlug()}` : '/auth/login'
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-border">
@@ -20,38 +25,27 @@ export function Header() {
             <Image
               src="/penta-merch-logo.png"
               alt="PentaMerch"
-              width={180}
-              height={48}
-              className="h-8 md:h-9 w-auto"
+              width={220}
+              height={60}
+              className="h-10 md:h-12 w-auto"
               priority
             />
           </Link>
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-foreground hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link href="/products" className="text-foreground hover:text-primary transition-colors">
-              Products
-            </Link>
-            <Link href="/products?category=electronics" className="text-foreground hover:text-primary transition-colors">
-              Electronics
-            </Link>
-            <Link href="/products?category=fashion" className="text-foreground hover:text-primary transition-colors">
-              Fashion
-            </Link>
-            <Link href="/contact-us" className="text-foreground hover:text-primary transition-colors">
-              Contact
-            </Link>
-            
+            {navItems.map((item) => (
+              <Link key={item.id} href={item.href} className="text-foreground hover:text-primary transition-colors">
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-muted rounded-lg transition-colors">
-              <Search className="w-5 h-5 text-foreground" />
-            </button>
+            <Link href={profileLink} className="p-2 hover:bg-muted rounded-lg transition-colors" aria-label={user ? 'Go to account' : 'Go to login'}>
+              <User className="w-5 h-5 text-foreground" />
+            </Link>
             <Link href="/cart" className="relative p-2 hover:bg-muted rounded-lg transition-colors">
               <ShoppingCart className="w-5 h-5 text-foreground" />
               {cartCount > 0 && (
@@ -78,23 +72,11 @@ export function Header() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <nav className="md:hidden pb-4 flex flex-col gap-2">
-            <Link href="/" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Home
-            </Link>
-            <Link href="/products" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Products
-            </Link>
-            <Link href="/products?category=electronics" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Electronics
-            </Link>
-            <Link href="/products?category=fashion" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Fashion
-            </Link>
-            <Link href="/contact-us" className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-              Contact Us
-            </Link>
-            
-            
+            {navItems.map((item) => (
+              <Link key={`mobile-${item.id}`} href={item.href} className="px-4 py-2 text-foreground hover:bg-muted rounded-lg transition-colors">
+                {item.label}
+              </Link>
+            ))}
           </nav>
         )}
       </div>
