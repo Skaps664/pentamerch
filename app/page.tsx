@@ -1,6 +1,7 @@
 'use client'
 
-import { HeroSection } from '@/components/hero-section'
+import { SimpleHero } from '@/components/featured-hero'
+import { BannerCard } from '@/components/banner-cta'
 import { ProductCarousel } from '@/components/product-carousel'
 import { CategoryCard } from '@/components/category-card'
 import { useSiteData } from '@/lib/site-data-context'
@@ -60,13 +61,7 @@ export default function Home() {
   return (
     <>
       {homeConfig.hero.enabled ? (
-        <HeroSection
-          title={homeConfig.hero.title}
-          subtitle={homeConfig.hero.subtitle}
-          cta={{ text: homeConfig.hero.ctaText, href: homeConfig.hero.ctaHref }}
-          slides={homeConfig.hero.slides}
-          dark={true}
-        />
+        <SimpleHero slides={homeConfig.hero.slides} />
       ) : null}
 
       {homeConfig.featured.enabled && featuredProducts.length > 0 ? (
@@ -74,13 +69,14 @@ export default function Home() {
       ) : null}
 
       {homeConfig.bannerOne.enabled ? (
-        <HeroSection
+        <BannerCard
           title={homeConfig.bannerOne.title}
           subtitle={homeConfig.bannerOne.subtitle}
-          cta={{ text: homeConfig.bannerOne.ctaText, href: homeConfig.bannerOne.ctaHref }}
-          slides={homeConfig.bannerOne.image ? [homeConfig.bannerOne.image] : undefined}
+          ctaText={homeConfig.bannerOne.ctaText}
+          ctaHref={homeConfig.bannerOne.ctaHref}
+          image={homeConfig.bannerOne.image}
           background={homeConfig.bannerOne.background}
-          dark={true}
+          imagePosition="left"
         />
       ) : null}
 
@@ -92,7 +88,7 @@ export default function Home() {
       ) : null}
 
       {homeConfig.trust.enabled ? (
-        <section className="border-y border-border/60 py-12 bg-muted/20">
+        <section className="border-y border-border/60 py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between gap-4 mb-6 md:mb-8">
               <div>
@@ -136,7 +132,7 @@ export default function Home() {
       ) : null}
 
       {homeConfig.categories.enabled ? (
-        <section className="py-12 md:py-16 bg-muted/50">
+        <section className="py-12 md:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">
               {homeConfig.categories.title}
@@ -157,13 +153,14 @@ export default function Home() {
       ) : null}
 
       {homeConfig.bannerTwo.enabled ? (
-        <HeroSection
+        <BannerCard
           title={homeConfig.bannerTwo.title}
           subtitle={homeConfig.bannerTwo.subtitle}
-          cta={{ text: homeConfig.bannerTwo.ctaText, href: homeConfig.bannerTwo.ctaHref }}
-          slides={homeConfig.bannerTwo.image ? [homeConfig.bannerTwo.image] : undefined}
+          ctaText={homeConfig.bannerTwo.ctaText}
+          ctaHref={homeConfig.bannerTwo.ctaHref}
+          image={homeConfig.bannerTwo.image}
           background={homeConfig.bannerTwo.background}
-          dark={true}
+          imagePosition="right"
         />
       ) : null}
 
