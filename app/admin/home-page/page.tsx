@@ -241,9 +241,13 @@ export default function AdminHomePageSettings() {
       <div className="rounded-lg border border-slate-300 bg-white p-6 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() => {
-            setHomeConfig(draft)
-            setSavedFlash()
+          onClick={async () => {
+            try {
+              await setHomeConfig(draft)
+              setSavedFlash()
+            } catch (error) {
+              window.alert(error instanceof Error ? error.message : 'Unable to save home settings.')
+            }
           }}
           className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800"
         >

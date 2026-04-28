@@ -22,12 +22,12 @@ export default function LoginPage() {
     }
   }, [hydrated, user, getUserSlug, router])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setIsSubmitting(true)
 
-    const result = login({ email, password })
+    const result = await login({ email, password })
 
     if (!result.ok) {
       setError(result.message)
@@ -42,6 +42,7 @@ export default function LoginPage() {
     }
 
     router.push('/')
+    setIsSubmitting(false)
   }
 
   return (

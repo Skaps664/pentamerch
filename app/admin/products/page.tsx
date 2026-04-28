@@ -79,7 +79,7 @@ export default function AdminProductsPage() {
     setForm(emptyProduct())
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.category) {
       return
     }
@@ -98,13 +98,17 @@ export default function AdminProductsPage() {
       returnInfo: form.returnInfo ?? [],
     }
 
-    if (editingId) {
-      updateProduct(editingId, payload)
-    } else {
-      createProduct(payload)
-    }
+    try {
+      if (editingId) {
+        await updateProduct(editingId, payload)
+      } else {
+        await createProduct(payload)
+      }
 
-    resetForm()
+      resetForm()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to save product.')
+    }
   }
 
   const openCreateForm = () => {
@@ -454,7 +458,13 @@ export default function AdminProductsPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => deleteProduct(product.id)}
+                      onClick={async () => {
+                        try {
+                          await deleteProduct(product.id)
+                        } catch (error) {
+                          window.alert(error instanceof Error ? error.message : 'Unable to delete product.')
+                        }
+                      }}
                       className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
                     >
                       Delete

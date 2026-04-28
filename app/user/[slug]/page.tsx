@@ -291,9 +291,9 @@ export default function UserSlugPage() {
 
               <form
                 className="mt-4 space-y-3"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault()
-                  const result = updateAddress(addressForm)
+                  const result = await updateAddress(addressForm)
                   setAddressMessage(result.message)
                 }}
               >
@@ -321,9 +321,9 @@ export default function UserSlugPage() {
 
               <form
                 className="mt-4 space-y-3"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault()
-                  const result = changePassword({
+                  const result = await changePassword({
                     currentPassword,
                     newPassword,
                     confirmPassword,
@@ -349,8 +349,8 @@ export default function UserSlugPage() {
               <div className="mt-6 pt-4 border-t border-border">
                 <button
                   type="button"
-                  onClick={() => {
-                    logout()
+                  onClick={async () => {
+                    await logout()
                     router.push('/auth/login')
                   }}
                   className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"

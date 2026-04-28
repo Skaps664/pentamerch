@@ -1,9 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-
-const USERS_KEY = 'pentamerch-auth-users-v1'
-const CURRENT_USER_KEY = 'pentamerch-auth-current-user-v1'
+import { getSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 export interface UserAddress {
   fullName: string
@@ -14,13 +12,6 @@ export interface UserAddress {
   county: string
   postcode: string
   country: string
-}
-
-interface StoredUser {
-  username: string
-  email: string
-  password: string
-  address: UserAddress
 }
 
 interface AuthUser {
@@ -47,15 +38,20 @@ interface ChangePasswordPayload {
   confirmPassword: string
 }
 
+interface AuthActionResult {
+  ok: boolean
+  message: string
+}
+
 interface AuthContextValue {
   hydrated: boolean
   user: AuthUser | null
-  signup: (payload: SignupPayload) => { ok: boolean; message: string }
-  login: (payload: LoginPayload) => { ok: boolean; message: string }
+  signup: (payload: SignupPayload) => Promise<AuthActionResult>
+  login: (payload: LoginPayload) => Promise<AuthActionResult>
   getUserSlug: () => string | null
-  updateAddress: (address: UserAddress) => { ok: boolean; message: string }
-  changePassword: (payload: ChangePasswordPayload) => { ok: boolean; message: string }
-  logout: () => void
+  updateAddress: (address: UserAddress) => Promise<AuthActionResult>
+  changePassword: (payload: ChangePasswordPayload) => Promise<AuthActionResult>
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -86,32 +82,56 @@ export function toUserSlug(username: string): string {
 function migrateAddress(address?: Partial<UserAddress>): UserAddress {
   return {
     ...defaultAddress,
-    ...address,
+    ...(address ?? {}),
   }
 }
 
-function readUsers(): StoredUser[] {
-  try {
-    const savedUsers = window.localStorage.getItem(USERS_KEY)
-    const users = savedUsers ? (JSON.parse(savedUsers) as StoredUser[]) : []
-    return users.map((item) => ({
-      ...item,
-      address: migrateAddress(item.address),
-    }))
-  } catch {
-    return []
+async function fetchProfile(): Promise<AuthUser | null> {
+  const response = await fetch('/api/auth/profile', { cache: 'no-store' })
+  if (!response.ok) {
+    return null
   }
-}
 
-function writeUsers(users: StoredUser[]) {
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users))
-}
+  const payload = (await response.json()) as {
+    email: string
+    username: string
+    address?: Partial<UserAddress>
+  }
 
-function toAuthUser(user: StoredUser): AuthUser {
+  if (!payload?.email || !payload?.username) {
+    return null
+  }
+
   return {
-    username: user.username,
-    email: user.email,
-    address: migrateAddress(user.address),
+    email: payload.email,
+    username: payload.username,
+    address: migrateAddress(payload.address),
+  }
+}
+
+async function upsertProfile(profile: { username: string; address: UserAddress }): Promise<AuthUser | null> {
+  const response = await fetch('/api/auth/profile', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(profile),
+  })
+
+  if (!response.ok) {
+    return null
+  }
+
+  const payload = (await response.json()) as {
+    email: string
+    username: string
+    address?: Partial<UserAddress>
+  }
+
+  return {
+    email: payload.email,
+    username: payload.username,
+    address: migrateAddress(payload.address),
   }
 }
 
@@ -120,22 +140,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
 
   useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(CURRENT_USER_KEY)
-      if (saved) {
-        setUser(JSON.parse(saved) as AuthUser)
+    const supabase = getSupabaseBrowserClient()
+
+    const initialize = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session) {
+          const profile = await fetchProfile()
+          setUser(profile)
+        } else {
+          setUser(null)
+        }
+      } finally {
+        setHydrated(true)
       }
-    } catch {
-      setUser(null)
-    } finally {
-      setHydrated(true)
+    }
+
+    void initialize()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        setUser(null)
+        return
+      }
+
+      void fetchProfile().then((profile) => {
+        setUser(profile)
+      })
+    })
+
+    return () => {
+      subscription.unsubscribe()
     }
   }, [])
 
   const value = useMemo<AuthContextValue>(() => ({
     hydrated,
     user,
-    signup: ({ username, email, password, confirmPassword }) => {
+    signup: async ({ username, email, password, confirmPassword }) => {
       const cleanUsername = username.trim()
       const cleanEmail = normalizeEmail(email)
 
@@ -151,56 +198,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { ok: false, message: 'Password must be at least 6 characters.' }
       }
 
-      try {
-        const users = readUsers()
+      const supabase = getSupabaseBrowserClient()
+      const { data, error } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          data: {
+            username: cleanUsername,
+          },
+        },
+      })
 
-        if (users.some((item) => normalizeEmail(item.email) === cleanEmail)) {
-          return { ok: false, message: 'Email already registered.' }
-        }
-
-        const newUser: StoredUser = {
-          username: cleanUsername,
-          email: cleanEmail,
-          password,
-          address: defaultAddress,
-        }
-
-        const nextUsers = [...users, newUser]
-        writeUsers(nextUsers)
-
-        const authUser = toAuthUser(newUser)
-        setUser(authUser)
-        window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(authUser))
-
-        return { ok: true, message: 'Account created successfully.' }
-      } catch {
-        return { ok: false, message: 'Unable to create account. Please try again.' }
+      if (error) {
+        return { ok: false, message: error.message }
       }
+
+      if (!data.session) {
+        return {
+          ok: true,
+          message: 'Signup successful. Please verify your email before logging in.',
+        }
+      }
+
+      const profile = await upsertProfile({
+        username: cleanUsername,
+        address: defaultAddress,
+      })
+
+      if (!profile) {
+        return { ok: false, message: 'Unable to create your profile.' }
+      }
+
+      setUser(profile)
+      return { ok: true, message: 'Account created successfully.' }
     },
-    login: ({ email, password }) => {
+    login: async ({ email, password }) => {
       const cleanEmail = normalizeEmail(email)
+
       if (!cleanEmail || !password) {
         return { ok: false, message: 'Email and password are required.' }
       }
 
-      try {
-        const users = readUsers()
+      const supabase = getSupabaseBrowserClient()
+      const { error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      })
 
-        const matched = users.find(
-          (item) => normalizeEmail(item.email) === cleanEmail && item.password === password
-        )
-
-        if (!matched) {
-          return { ok: false, message: 'Invalid email or password.' }
-        }
-
-        const authUser = toAuthUser(matched)
-        setUser(authUser)
-        window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(authUser))
-        return { ok: true, message: 'Logged in successfully.' }
-      } catch {
-        return { ok: false, message: 'Unable to log in right now. Please try again.' }
+      if (error) {
+        return { ok: false, message: error.message }
       }
+
+      const profile = await fetchProfile()
+      if (!profile) {
+        return { ok: false, message: 'Unable to load your profile.' }
+      }
+
+      setUser(profile)
+      return { ok: true, message: 'Logged in successfully.' }
     },
     getUserSlug: () => {
       if (!user) {
@@ -209,41 +264,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return toUserSlug(user.username)
     },
-    updateAddress: (address) => {
+    updateAddress: async (address) => {
       if (!user) {
         return { ok: false, message: 'You need to be logged in.' }
       }
 
-      const nextAddress = migrateAddress(address)
+      const profile = await upsertProfile({
+        username: user.username,
+        address: migrateAddress(address),
+      })
 
-      try {
-        const users = readUsers()
-        const index = users.findIndex((item) => normalizeEmail(item.email) === normalizeEmail(user.email))
-
-        if (index === -1) {
-          return { ok: false, message: 'User not found.' }
-        }
-
-        users[index] = {
-          ...users[index],
-          address: nextAddress,
-        }
-
-        writeUsers(users)
-
-        const nextUser: AuthUser = {
-          ...user,
-          address: nextAddress,
-        }
-
-        setUser(nextUser)
-        window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(nextUser))
-        return { ok: true, message: 'Address updated successfully.' }
-      } catch {
+      if (!profile) {
         return { ok: false, message: 'Unable to update address.' }
       }
+
+      setUser(profile)
+      return { ok: true, message: 'Address updated successfully.' }
     },
-    changePassword: ({ currentPassword, newPassword, confirmPassword }) => {
+    changePassword: async ({ currentPassword, newPassword, confirmPassword }) => {
       if (!user) {
         return { ok: false, message: 'You need to be logged in.' }
       }
@@ -260,32 +298,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { ok: false, message: 'New passwords do not match.' }
       }
 
-      try {
-        const users = readUsers()
-        const index = users.findIndex((item) => normalizeEmail(item.email) === normalizeEmail(user.email))
+      const supabase = getSupabaseBrowserClient()
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      })
 
-        if (index === -1) {
-          return { ok: false, message: 'User not found.' }
-        }
-
-        if (users[index].password !== currentPassword) {
-          return { ok: false, message: 'Current password is incorrect.' }
-        }
-
-        users[index] = {
-          ...users[index],
-          password: newPassword,
-        }
-
-        writeUsers(users)
-        return { ok: true, message: 'Password changed successfully.' }
-      } catch {
-        return { ok: false, message: 'Unable to change password.' }
+      if (verifyError) {
+        return { ok: false, message: 'Current password is incorrect.' }
       }
+
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) {
+        return { ok: false, message: error.message }
+      }
+
+      return { ok: true, message: 'Password changed successfully.' }
     },
-    logout: () => {
+    logout: async () => {
+      const supabase = getSupabaseBrowserClient()
+      await supabase.auth.signOut()
       setUser(null)
-      window.localStorage.removeItem(CURRENT_USER_KEY)
     },
   }), [hydrated, user])
 

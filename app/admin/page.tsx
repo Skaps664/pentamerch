@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { NAVBAR_PAGE_OPTIONS, useSiteData } from '@/lib/site-data-context'
+import { useEffect, useMemo, useState } from 'react'
+import { getNavbarPageOptions, useSiteData } from '@/lib/site-data-context'
 
 export default function AdminDashboardPage() {
   const { products, categories, homeConfig, navItems, setNavItems } = useSiteData()
   const [selectedNavIds, setSelectedNavIds] = useState<string[]>(navItems.map((item) => item.id))
   const [savedNav, setSavedNav] = useState(false)
+  const navOptions = useMemo(() => getNavbarPageOptions(categories), [categories])
 
   const totalInStock = products.filter((item) => item.inStock).length
   const featuredCount = products.filter((item) => item.isFeatured).length
@@ -22,15 +23,19 @@ export default function AdminDashboardPage() {
     )
   }
 
-  const saveNavbarItems = () => {
-    const nextItems = NAVBAR_PAGE_OPTIONS.filter((item) => selectedNavIds.includes(item.id))
+  const saveNavbarItems = async () => {
+    const nextItems = navOptions.filter((item) => selectedNavIds.includes(item.id))
     if (nextItems.length === 0) {
       return
     }
 
-    setNavItems(nextItems)
-    setSavedNav(true)
-    window.setTimeout(() => setSavedNav(false), 1800)
+    try {
+      await setNavItems(nextItems)
+      setSavedNav(true)
+      window.setTimeout(() => setSavedNav(false), 1800)
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to save navbar links.')
+    }
   }
 
   return (
@@ -93,7 +98,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {NAVBAR_PAGE_OPTIONS.map((item) => (
+          {navOptions.map((item) => (
             <label key={item.id} className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700">
               <input
                 type="checkbox"

@@ -24,12 +24,12 @@ export default function SignupPage() {
     }
   }, [hydrated, user, getUserSlug, router])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setIsSubmitting(true)
 
-    const result = signup({ username, email, password, confirmPassword })
+    const result = await signup({ username, email, password, confirmPassword })
 
     if (!result.ok) {
       setError(result.message)
@@ -44,6 +44,7 @@ export default function SignupPage() {
     }
 
     router.push('/')
+    setIsSubmitting(false)
   }
 
   return (

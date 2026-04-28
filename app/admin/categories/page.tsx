@@ -37,29 +37,33 @@ export default function AdminCategoriesPage() {
     setEditingId(null)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name.trim() || !form.slug.trim()) {
       return
     }
 
-    if (editingId) {
-      updateCategory(editingId, {
-        name: form.name,
-        slug: form.slug,
-        image: form.image,
-        description: form.description,
-      })
-    } else {
-      createCategory({
-        id: form.id || form.slug,
-        name: form.name,
-        slug: form.slug,
-        image: form.image,
-        description: form.description,
-      })
-    }
+    try {
+      if (editingId) {
+        await updateCategory(editingId, {
+          name: form.name,
+          slug: form.slug,
+          image: form.image,
+          description: form.description,
+        })
+      } else {
+        await createCategory({
+          id: form.id || form.slug,
+          name: form.name,
+          slug: form.slug,
+          image: form.image,
+          description: form.description,
+        })
+      }
 
-    resetForm()
+      resetForm()
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to save category.')
+    }
   }
 
   const usedCategoryIds = new Set(products.map((item) => item.category))
@@ -173,7 +177,7 @@ export default function AdminCategoriesPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const hasProducts = products.some(
                           (item) => item.category === category.slug || item.category === category.id
                         )
@@ -181,7 +185,12 @@ export default function AdminCategoriesPage() {
                           window.alert('This category has products. Reassign or delete those products first.')
                           return
                         }
-                        deleteCategory(category.id)
+
+                        try {
+                          await deleteCategory(category.id)
+                        } catch (error) {
+                          window.alert(error instanceof Error ? error.message : 'Unable to delete category.')
+                        }
                       }}
                       className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
                     >
