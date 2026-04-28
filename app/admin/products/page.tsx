@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 import type { Product } from '@/lib/data'
 import { useSiteData } from '@/lib/site-data-context'
 
@@ -21,7 +22,7 @@ function emptyProduct(): Omit<Product, 'id'> {
     description: '',
     category: '',
     image: '',
-    rating: 4,
+    rating: 0,
     reviews: 0,
     inStock: true,
     isFeatured: false,
@@ -66,12 +67,22 @@ export default function AdminProductsPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isBannerEditorOpen, setIsBannerEditorOpen] = useState(false)
   const [form, setForm] = useState<Omit<Product, 'id'>>(emptyProduct())
+  const [bannerDraft, setBannerDraft] = useState(productPageConfig.detailBanner)
+  const [specificationsText, setSpecificationsText] = useState('')
+  const [isSavingProduct, setIsSavingProduct] = useState(false)
+  const [isSavingBanner, setIsSavingBanner] = useState(false)
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null)
 
   const categoryOptions = useMemo(
     () => categories.map((item) => ({ value: item.slug || item.id, label: item.name })),
     [categories]
   )
+
+  useEffect(() => {
+    setBannerDraft(productPageConfig.detailBanner)
+  }, [productPageConfig.detailBanner])
 
   const resetForm = () => {
     setEditingId(null)
@@ -84,6 +95,10 @@ export default function AdminProductsPage() {
       return
     }
 
+    if (!window.confirm(editingId ? 'Save these product changes?' : 'Create this product?')) {
+      return
+    }
+
     const additionalImages = (form.images ?? []).filter(Boolean)
 
     const payload: Omit<Product, 'id'> = {
@@ -92,13 +107,14 @@ export default function AdminProductsPage() {
         ? [form.image, ...additionalImages.filter((item) => item !== form.image)]
         : additionalImages,
       originalPrice: form.originalPrice && form.originalPrice > 0 ? form.originalPrice : undefined,
-      specifications: form.specifications ?? {},
+      specifications: parseSpecifications(specificationsText),
       keyFeatures: form.keyFeatures ?? [],
       shippingInfo: form.shippingInfo ?? [],
       returnInfo: form.returnInfo ?? [],
     }
 
     try {
+      setIsSavingProduct(true)
       if (editingId) {
         await updateProduct(editingId, payload)
       } else {
@@ -108,12 +124,15 @@ export default function AdminProductsPage() {
       resetForm()
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Unable to save product.')
+    } finally {
+      setIsSavingProduct(false)
     }
   }
 
   const openCreateForm = () => {
     setEditingId(null)
     setForm(emptyProduct())
+    setSpecificationsText('')
     setIsFormOpen(true)
   }
 
@@ -132,11 +151,15 @@ export default function AdminProductsPage() {
       isFeatured: product.isFeatured,
       isBestseller: product.isBestseller,
       images: (product.images ?? []).filter((item) => item !== product.image),
-      specifications: product.specifications ?? {},
       keyFeatures: product.keyFeatures ?? [],
       shippingInfo: product.shippingInfo ?? [],
       returnInfo: product.returnInfo ?? [],
     })
+    setSpecificationsText(
+      Object.entries(product.specifications ?? {})
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n')
+    )
     setIsFormOpen(true)
   }
 
@@ -168,116 +191,115 @@ export default function AdminProductsPage() {
             <h3 className="text-lg font-semibold text-slate-900">Universal Product Page Banner</h3>
             <p className="text-sm text-slate-600 mt-1">This banner appears before Related Products on every product slug page.</p>
           </div>
-          <label className="flex items-center gap-2 text-sm text-slate-700">
+          <button
+            type="button"
+            onClick={() => setIsBannerEditorOpen((prev) => !prev)}
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+          >
+            {isBannerEditorOpen ? 'Close Banner Editor' : 'Edit Banner Settings'}
+          </button>
+        </div>
+
+        {isBannerEditorOpen ? (
+          <>
+            <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              Current status: <span className="font-medium">{bannerDraft.enabled ? 'Visible' : 'Hidden'}</span>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={bannerDraft.enabled}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, enabled: e.target.checked }))}
+              />
+              Enable Banner
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Banner Title"
+                value={bannerDraft.title}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, title: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Button Text"
+                value={bannerDraft.linkText}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, linkText: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
+                placeholder="Banner Description"
+                value={bannerDraft.text}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, text: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Banner Link"
+                value={bannerDraft.linkHref}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, linkHref: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Banner Image URL"
+                value={bannerDraft.image}
+                onChange={(e) => setBannerDraft((prev) => ({ ...prev, image: e.target.value }))}
+              />
+            </div>
+
             <input
-              type="checkbox"
-              checked={productPageConfig.detailBanner.enabled}
-              onChange={(e) =>
-                setProductPageConfig({
-                  ...productPageConfig,
-                  detailBanner: {
-                    ...productPageConfig.detailBanner,
-                    enabled: e.target.checked,
-                  },
-                })
-              }
+              type="file"
+              accept="image/*"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm w-full"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) {
+                  return
+                }
+                const image = await toDataUrl(file)
+                setBannerDraft((prev) => ({ ...prev, image }))
+              }}
             />
-            Enable Banner
-          </label>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Banner Title"
-            value={productPageConfig.detailBanner.title}
-            onChange={(e) =>
-              setProductPageConfig({
-                ...productPageConfig,
-                detailBanner: {
-                  ...productPageConfig.detailBanner,
-                  title: e.target.value,
-                },
-              })
-            }
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Button Text"
-            value={productPageConfig.detailBanner.linkText}
-            onChange={(e) =>
-              setProductPageConfig({
-                ...productPageConfig,
-                detailBanner: {
-                  ...productPageConfig.detailBanner,
-                  linkText: e.target.value,
-                },
-              })
-            }
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
-            placeholder="Banner Description"
-            value={productPageConfig.detailBanner.text}
-            onChange={(e) =>
-              setProductPageConfig({
-                ...productPageConfig,
-                detailBanner: {
-                  ...productPageConfig.detailBanner,
-                  text: e.target.value,
-                },
-              })
-            }
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Banner Link"
-            value={productPageConfig.detailBanner.linkHref}
-            onChange={(e) =>
-              setProductPageConfig({
-                ...productPageConfig,
-                detailBanner: {
-                  ...productPageConfig.detailBanner,
-                  linkHref: e.target.value,
-                },
-              })
-            }
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Banner Image URL"
-            value={productPageConfig.detailBanner.image}
-            onChange={(e) =>
-              setProductPageConfig({
-                ...productPageConfig,
-                detailBanner: {
-                  ...productPageConfig.detailBanner,
-                  image: e.target.value,
-                },
-              })
-            }
-          />
-        </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!window.confirm('Save this product page banner?')) {
+                    return
+                  }
 
-        <input
-          type="file"
-          accept="image/*"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm w-full"
-          onChange={async (e) => {
-            const file = e.target.files?.[0]
-            if (!file) {
-              return
-            }
-            const image = await toDataUrl(file)
-            setProductPageConfig({
-              ...productPageConfig,
-              detailBanner: {
-                ...productPageConfig.detailBanner,
-                image,
-              },
-            })
-          }}
-        />
+                  try {
+                    setIsSavingBanner(true)
+                    await setProductPageConfig({
+                      ...productPageConfig,
+                      detailBanner: bannerDraft,
+                    })
+                    setIsBannerEditorOpen(false)
+                  } catch (error) {
+                    window.alert(error instanceof Error ? error.message : 'Unable to save product page banner.')
+                  } finally {
+                    setIsSavingBanner(false)
+                  }
+                }}
+                disabled={isSavingBanner}
+                className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800"
+              >
+                {isSavingBanner ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Spinner className="size-4" />
+                    Saving...
+                  </span>
+                ) : (
+                  'Save Banner Settings'
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-slate-600">Click Edit Banner Settings to change the banner title, text, image, or link.</p>
+        )}
       </div>
 
       {isFormOpen ? (
@@ -294,13 +316,8 @@ export default function AdminProductsPage() {
               className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
               rows={4}
               placeholder="Specifications (one per line, format: Key: Value)"
-              value={Object.entries(form.specifications ?? {})
-                .map(([key, value]) => `${key}: ${value}`)
-                .join('\n')}
-              onChange={(e) => setForm((prev) => ({
-                ...prev,
-                specifications: parseSpecifications(e.target.value),
-              }))}
+              value={specificationsText}
+              onChange={(e) => setSpecificationsText(e.target.value)}
             />
 
             <textarea
@@ -421,8 +438,21 @@ export default function AdminProductsPage() {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={handleSave} className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800">
-              {editingId ? 'Save Changes' : 'Create Product'}
+            <button
+              onClick={handleSave}
+              disabled={isSavingProduct}
+              className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              {isSavingProduct ? (
+                <span className="inline-flex items-center gap-2">
+                  <Spinner className="size-4" />
+                  Saving...
+                </span>
+              ) : editingId ? (
+                'Save Changes'
+              ) : (
+                'Create Product'
+              )}
             </button>
             <button onClick={resetForm} className="rounded-md border border-slate-300 px-5 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100">
               Cancel
@@ -452,7 +482,13 @@ export default function AdminProductsPage() {
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => openEditForm(product)}
+                      onClick={() => {
+                        if (!window.confirm(`Edit ${product.name}?`)) {
+                          return
+                        }
+
+                        openEditForm(product)
+                      }}
                       className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
                     >
                       Edit
@@ -460,14 +496,29 @@ export default function AdminProductsPage() {
                     <button
                       onClick={async () => {
                         try {
+                          if (!window.confirm(`Delete ${product.name}?`)) {
+                            return
+                          }
+
+                          setDeletingProductId(product.id)
                           await deleteProduct(product.id)
                         } catch (error) {
                           window.alert(error instanceof Error ? error.message : 'Unable to delete product.')
+                        } finally {
+                          setDeletingProductId(null)
                         }
                       }}
+                      disabled={deletingProductId === product.id}
                       className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
                     >
-                      Delete
+                      {deletingProductId === product.id ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Spinner className="size-3.5" />
+                          Deleting
+                        </span>
+                      ) : (
+                        'Delete'
+                      )}
                     </button>
                   </div>
                 </td>

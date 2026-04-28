@@ -19,6 +19,7 @@ import {
   type ProductPageConfig,
   type SiteDataState,
 } from '@/lib/site-config'
+import { getSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 export { getNavbarPageOptions }
 export type { HomePageConfig, NavItem, ProductPageConfig }
@@ -52,11 +53,25 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
   return payload
 }
 
+async function getAdminRequestHeaders(): Promise<HeadersInit> {
+  const supabase = getSupabaseBrowserClient()
+  const { data } = await supabase.auth.getSession()
+  const accessToken = data.session?.access_token
+
+  return accessToken
+    ? {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    : {}
+}
+
 async function uploadImage(dataUrl: string, folder: string): Promise<string> {
+  const authHeaders = await getAdminRequestHeaders()
   const response = await fetch('/api/admin/upload', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
     },
     body: JSON.stringify({ dataUrl, folder }),
   })
@@ -176,10 +191,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     hydrated,
     setHomeConfig: async (config) => {
       const withUploadedImages = await uploadHomeConfigImages(config)
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch('/api/admin/config/home', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -189,10 +206,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     setProductPageConfig: async (config) => {
       const withUploadedImages = await uploadProductPageConfigImages(config)
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch('/api/admin/config/product-page', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -202,10 +221,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     setNavItems: async (items) => {
       const nextItems = normalizeNavItems(items, state.categories)
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch('/api/admin/config/nav', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(nextItems),
       })
@@ -218,10 +239,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     createCategory: async (payload) => {
       const withUploadedImages = await uploadCategoryImages(payload)
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch('/api/admin/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -234,10 +257,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     updateCategory: async (id, payload) => {
       const withUploadedImages = await uploadCategoryImages(payload as Omit<Category, 'id'> & { id?: string })
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -249,8 +274,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
       }))
     },
     deleteCategory: async (id) => {
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch(`/api/admin/categories/${id}`, {
         method: 'DELETE',
+        headers: {
+          ...authHeaders,
+        },
       })
 
       await parseJsonResponse<{ ok: boolean }>(response)
@@ -261,10 +290,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     createProduct: async (payload) => {
       const withUploadedImages = (await uploadProductImages(payload)) as Omit<Product, 'id'> & { id?: string }
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch('/api/admin/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -277,10 +308,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
     },
     updateProduct: async (id, payload) => {
       const withUploadedImages = await uploadProductImages(payload)
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch(`/api/admin/products/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify(withUploadedImages),
       })
@@ -292,8 +325,12 @@ export function SiteDataProvider({ children }: { children: ReactNode }) {
       }))
     },
     deleteProduct: async (id) => {
+      const authHeaders = await getAdminRequestHeaders()
       const response = await fetch(`/api/admin/products/${id}`, {
         method: 'DELETE',
+        headers: {
+          ...authHeaders,
+        },
       })
 
       await parseJsonResponse<{ ok: boolean }>(response)

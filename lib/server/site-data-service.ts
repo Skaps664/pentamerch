@@ -104,14 +104,17 @@ async function ensureSeeded() {
     await supabase.from('products').insert(defaultSiteDataState.products.map(toDbProduct))
   }
 
-  await supabase.from('site_config').upsert(
-    [
-      { key: 'homeConfig', value: defaultSiteDataState.homeConfig },
-      { key: 'productPageConfig', value: defaultSiteDataState.productPageConfig },
-      { key: 'navItems', value: defaultSiteDataState.navItems },
-    ],
-    { onConflict: 'key' }
-  )
+  const { data: configRows } = await supabase.from('site_config').select('key')
+  const existingKeys = new Set((configRows ?? []).map((row) => row.key))
+  const configSeedRows = [
+    { key: 'homeConfig', value: defaultSiteDataState.homeConfig },
+    { key: 'productPageConfig', value: defaultSiteDataState.productPageConfig },
+    { key: 'navItems', value: defaultSiteDataState.navItems },
+  ].filter((row) => !existingKeys.has(row.key))
+
+  if (configSeedRows.length > 0) {
+    await supabase.from('site_config').insert(configSeedRows)
+  }
 }
 
 export async function getSiteData(): Promise<SiteDataState> {

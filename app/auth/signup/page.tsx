@@ -1,12 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 export default function SignupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { hydrated, user, signup, getUserSlug } = useAuth()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -14,6 +16,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const returnTo = searchParams.get('returnTo') ?? ''
 
   useEffect(() => {
     if (hydrated && user) {
@@ -37,14 +40,7 @@ export default function SignupPage() {
       return
     }
 
-    const slug = getUserSlug()
-    if (slug) {
-      router.push(`/user/${slug}`)
-      return
-    }
-
-    router.push('/')
-    setIsSubmitting(false)
+    router.push(`/auth/login?message=${encodeURIComponent('Thank you for signing up. You can sign in now.')}${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ''}`)
   }
 
   return (

@@ -1,17 +1,29 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { hydrated, user, login, getUserSlug } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [infoMessage, setInfoMessage] = useState('')
+
+  const returnTo = searchParams.get('returnTo') ?? ''
+
+  useEffect(() => {
+    const message = searchParams.get('message')
+    if (message) {
+      setInfoMessage(message)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (hydrated && user) {
@@ -35,6 +47,11 @@ export default function LoginPage() {
       return
     }
 
+    if (returnTo) {
+      router.push(returnTo)
+      return
+    }
+
     const slug = getUserSlug()
     if (slug) {
       router.push(`/user/${slug}`)
@@ -42,7 +59,6 @@ export default function LoginPage() {
     }
 
     router.push('/')
-    setIsSubmitting(false)
   }
 
   return (
@@ -81,6 +97,7 @@ export default function LoginPage() {
               />
             </div>
 
+            {infoMessage ? <p className="text-sm text-green-700">{infoMessage}</p> : null}
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
             <button

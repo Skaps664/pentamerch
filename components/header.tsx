@@ -6,15 +6,17 @@ import { ShoppingCart, User, Menu, X } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { useSiteData } from '@/lib/site-data-context'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 export function Header() {
   const { items } = useCart()
   const { navItems } = useSiteData()
   const { user, getUserSlug } = useAuth()
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
-  const profileLink = user && getUserSlug() ? `/user/${getUserSlug()}` : '/auth/login'
+  const profileLink = user && getUserSlug() ? `/user/${getUserSlug()}` : `/auth/login?returnTo=${encodeURIComponent(pathname)}`
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-border">

@@ -52,6 +52,8 @@ export default function ProductPage() {
     return Array.from(new Set(merged))
   }, [product])
 
+  const thumbnailImages = galleryImages.slice(1)
+
   useEffect(() => {
     setSelectedImage(galleryImages[0] ?? product.image)
   }, [galleryImages, product.image])
@@ -131,9 +133,9 @@ export default function ProductPage() {
               />
             </div>
 
-            {galleryImages.length > 1 ? (
+            {thumbnailImages.length > 0 ? (
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                {galleryImages.map((image) => (
+                {thumbnailImages.map((image) => (
                   <button
                     key={image}
                     type="button"

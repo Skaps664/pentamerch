@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 
 export default function AccountPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, hydrated, getUserSlug } = useAuth()
 
   useEffect(() => {
@@ -14,7 +15,7 @@ export default function AccountPage() {
     }
 
     if (!user) {
-      router.replace('/auth/login')
+      router.replace(`/auth/login?returnTo=${encodeURIComponent(pathname)}`)
       return
     }
 
@@ -22,7 +23,7 @@ export default function AccountPage() {
     if (slug) {
       router.replace(`/user/${slug}`)
     }
-  }, [hydrated, user, getUserSlug, router])
+  }, [hydrated, pathname, user, getUserSlug, router])
 
   return (
     <section className="py-12 md:py-16 min-h-[60vh]">

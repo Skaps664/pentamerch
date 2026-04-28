@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 import type { HomePageConfig } from '@/lib/site-data-context'
 import { useSiteData } from '@/lib/site-data-context'
 
@@ -17,6 +18,7 @@ export default function AdminHomePageSettings() {
   const { homeConfig, products, setHomeConfig } = useSiteData()
   const [draft, setDraft] = useState<HomePageConfig>(homeConfig)
   const [saved, setSaved] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   const productOptions = useMemo(
     () => products.map((item) => ({ id: item.id, label: item.name })),
@@ -242,16 +244,31 @@ export default function AdminHomePageSettings() {
         <button
           type="button"
           onClick={async () => {
+            if (!window.confirm('Save these home page settings?')) {
+              return
+            }
+
             try {
+              setIsSaving(true)
               await setHomeConfig(draft)
               setSavedFlash()
             } catch (error) {
               window.alert(error instanceof Error ? error.message : 'Unable to save home settings.')
+            } finally {
+              setIsSaving(false)
             }
           }}
-          className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800"
+          disabled={isSaving}
+          className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
         >
-          Save Home Page Settings
+          {isSaving ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner className="size-4" />
+              Saving...
+            </span>
+          ) : (
+            'Save Home Page Settings'
+          )}
         </button>
         {saved ? <p className="text-sm text-green-700">Saved successfully.</p> : null}
       </div>

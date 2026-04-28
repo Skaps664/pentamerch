@@ -3,7 +3,7 @@ import { isAdminRequestAuthorized } from '@/lib/server/admin-auth'
 import { saveNavItems } from '@/lib/server/site-data-service'
 
 export async function PUT(request: Request) {
-  const isAuthorized = await isAdminRequestAuthorized()
+  const isAuthorized = await isAdminRequestAuthorized(request)
   if (!isAuthorized) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }

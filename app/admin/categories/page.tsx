@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 import { useSiteData } from '@/lib/site-data-context'
 
 const emptyForm = {
@@ -31,10 +32,14 @@ export default function AdminCategoriesPage() {
 
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const resetForm = () => {
     setForm(emptyForm)
     setEditingId(null)
+    setIsCreateOpen(false)
   }
 
   const handleSubmit = async () => {
@@ -42,7 +47,12 @@ export default function AdminCategoriesPage() {
       return
     }
 
+    if (!window.confirm(editingId ? 'Save these category changes?' : 'Create this category?')) {
+      return
+    }
+
     try {
+      setIsSubmitting(true)
       if (editingId) {
         await updateCategory(editingId, {
           name: form.name,
@@ -63,6 +73,8 @@ export default function AdminCategoriesPage() {
       resetForm()
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Unable to save category.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -76,67 +88,92 @@ export default function AdminCategoriesPage() {
       </div>
 
       <div className="rounded-lg border border-slate-300 bg-white p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">
-          {editingId ? 'Edit Category' : 'Create Category'}
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Category Name"
-            value={form.name}
-            onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            placeholder="Slug (example: electronics)"
-            value={form.slug}
-            onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
-          />
-          <input
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
-            placeholder="Image URL"
-            value={form.image}
-            onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
-            onChange={async (e) => {
-              const file = e.target.files?.[0]
-              if (!file) {
-                return
-              }
-              const image = await toDataUrl(file)
-              setForm((prev) => ({ ...prev, image }))
-            }}
-          />
-          <textarea
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
-            rows={3}
-            placeholder="Category Description"
-            value={form.description}
-            onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={handleSubmit}
-            className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800"
-          >
-            {editingId ? 'Save Changes' : 'Create Category'}
-          </button>
-          {editingId ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {editingId ? 'Edit Category' : 'Create Category'}
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">Open the form only when you need it.</p>
+          </div>
+          {!editingId ? (
             <button
-              onClick={resetForm}
-              className="rounded-md border border-slate-300 px-5 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+              onClick={() => setIsCreateOpen((prev) => !prev)}
+              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
             >
-              Cancel
+              {isCreateOpen ? 'Hide Create Form' : 'Create Category'}
             </button>
           ) : null}
         </div>
+
+        {(isCreateOpen || editingId) ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Category Name"
+                value={form.name}
+                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                placeholder="Slug (example: electronics)"
+                value={form.slug}
+                onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
+              />
+              <input
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
+                placeholder="Image URL"
+                value={form.image}
+                onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) {
+                    return
+                  }
+                  const image = await toDataUrl(file)
+                  setForm((prev) => ({ ...prev, image }))
+                }}
+              />
+              <textarea
+                className="rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2"
+                rows={3}
+                placeholder="Category Description"
+                value={form.description}
+                onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+              >
+                {isSubmitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Spinner className="size-4" />
+                    Saving...
+                  </span>
+                ) : editingId ? (
+                  'Save Changes'
+                ) : (
+                  'Create Category'
+                )}
+              </button>
+              <button
+                onClick={resetForm}
+                className="rounded-md border border-slate-300 px-5 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : null}
       </div>
 
       <div className="rounded-lg border border-slate-300 bg-white overflow-hidden">
@@ -163,7 +200,12 @@ export default function AdminCategoriesPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
+                        if (!window.confirm(`Edit ${category.name}?`)) {
+                          return
+                        }
+
                         setEditingId(category.id)
+                        setIsCreateOpen(true)
                         setForm({
                           id: category.id,
                           name: category.name,
@@ -186,15 +228,30 @@ export default function AdminCategoriesPage() {
                           return
                         }
 
+                        if (!window.confirm(`Delete category ${category.name}?`)) {
+                          return
+                        }
+
                         try {
+                          setDeletingId(category.id)
                           await deleteCategory(category.id)
                         } catch (error) {
                           window.alert(error instanceof Error ? error.message : 'Unable to delete category.')
+                        } finally {
+                          setDeletingId(null)
                         }
                       }}
+                      disabled={deletingId === category.id}
                       className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
                     >
-                      Delete
+                      {deletingId === category.id ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <Spinner className="size-3.5" />
+                          Deleting
+                        </span>
+                      ) : (
+                        'Delete'
+                      )}
                     </button>
                   </div>
                 </td>

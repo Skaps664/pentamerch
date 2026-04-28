@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 import { getNavbarPageOptions, useSiteData } from '@/lib/site-data-context'
 
 export default function AdminDashboardPage() {
   const { products, categories, homeConfig, navItems, setNavItems } = useSiteData()
   const [selectedNavIds, setSelectedNavIds] = useState<string[]>(navItems.map((item) => item.id))
   const [savedNav, setSavedNav] = useState(false)
+  const [isSavingNav, setIsSavingNav] = useState(false)
   const navOptions = useMemo(() => getNavbarPageOptions(categories), [categories])
 
   const totalInStock = products.filter((item) => item.inStock).length
@@ -29,12 +31,19 @@ export default function AdminDashboardPage() {
       return
     }
 
+    if (!window.confirm('Save these navbar links?')) {
+      return
+    }
+
     try {
+      setIsSavingNav(true)
       await setNavItems(nextItems)
       setSavedNav(true)
       window.setTimeout(() => setSavedNav(false), 1800)
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Unable to save navbar links.')
+    } finally {
+      setIsSavingNav(false)
     }
   }
 
@@ -114,10 +123,17 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             onClick={saveNavbarItems}
-            disabled={selectedNavIds.length === 0}
+            disabled={selectedNavIds.length === 0 || isSavingNav}
             className="rounded-md bg-slate-900 text-white px-5 py-2 text-sm font-medium hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
-            Save Navbar Links
+            {isSavingNav ? (
+              <span className="inline-flex items-center gap-2">
+                <Spinner className="size-4" />
+                Saving...
+              </span>
+            ) : (
+              'Save Navbar Links'
+            )}
           </button>
           {selectedNavIds.length === 0 ? <p className="text-sm text-red-700">Select at least one page.</p> : null}
           {savedNav ? <p className="text-sm text-green-700">Navbar links updated.</p> : null}

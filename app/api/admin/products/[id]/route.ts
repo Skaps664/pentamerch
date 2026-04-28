@@ -6,7 +6,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const isAuthorized = await isAdminRequestAuthorized()
+  const isAuthorized = await isAdminRequestAuthorized(request)
   if (!isAuthorized) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
@@ -26,7 +26,7 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const isAuthorized = await isAdminRequestAuthorized()
+  const isAuthorized = await isAdminRequestAuthorized(_request)
   if (!isAuthorized) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }

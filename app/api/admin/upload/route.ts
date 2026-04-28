@@ -24,7 +24,7 @@ function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; contentType: string
 }
 
 export async function POST(request: Request) {
-  const isAuthorized = await isAdminRequestAuthorized()
+  const isAuthorized = await isAdminRequestAuthorized(request)
   if (!isAuthorized) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }

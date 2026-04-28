@@ -10,7 +10,7 @@ export default function CheckoutPage() {
   const { items, clearCart } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [orderNumber] = useState(Math.floor(Math.random() * 1000000))
+  const [orderNumber, setOrderNumber] = useState('')
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shipping = subtotal > 50 ? 0 : 10
@@ -44,12 +44,52 @@ export default function CheckoutPage() {
     e.preventDefault()
     setIsProcessing(true)
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          customerName: `${formData.firstName} ${formData.lastName}`.trim(),
+          items: items.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+          })),
+          total,
+          shipping,
+          tax,
+          deliveryAddress: {
+            fullName: `${formData.firstName} ${formData.lastName}`.trim(),
+            phone: formData.phone,
+            line1: formData.address,
+            line2: '',
+            city: formData.city,
+            county: formData.state,
+            postcode: formData.zipCode,
+            country: 'United Kingdom',
+          },
+        }),
+      })
 
-    // Success!
-    setIsSuccess(true)
-    clearCart()
+      if (!response.ok) {
+        const payload = (await response.json()) as { message?: string }
+        throw new Error(payload.message ?? 'Unable to place order.')
+      }
+
+      const createdOrder = (await response.json()) as { id: string }
+      setOrderNumber(createdOrder.id)
+      setIsSuccess(true)
+      clearCart()
+    } catch {
+      window.alert('Unable to place your order right now. Please try again.')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   if (isSuccess) {
