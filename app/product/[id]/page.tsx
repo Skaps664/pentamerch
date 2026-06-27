@@ -21,7 +21,7 @@ import { useSiteData } from '@/lib/site-data-context'
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>()
-  const { products, productPageConfig } = useSiteData()
+  const { products, productPageConfig, hydrated } = useSiteData()
   const productId = Array.isArray(params?.id) ? params.id[0] : params?.id
   const product = products.find((p) => p.id === productId)
   const { addItem } = useCart()
@@ -31,6 +31,10 @@ export default function ProductPage() {
   const [selectedImage, setSelectedImage] = useState<string>('')
 
   if (!product) {
+    if (!hydrated) {
+      return <div className="min-h-screen" />
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

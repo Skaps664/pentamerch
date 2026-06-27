@@ -183,6 +183,77 @@ export const defaultSiteDataState: SiteDataState = {
   navItems: getNavbarPageOptions(defaultCategories),
 }
 
+// An empty state used as the initial client-side state so we never render
+// mock/seed data before the real data is loaded from the database.
+export const emptySiteDataState: SiteDataState = {
+  products: [],
+  categories: [],
+  homeConfig: {
+    hero: {
+      enabled: false,
+      title: '',
+      subtitle: '',
+      ctaText: '',
+      ctaHref: '',
+      slides: [],
+    },
+    featured: {
+      enabled: false,
+      title: '',
+      productIds: [],
+    },
+    bannerOne: {
+      enabled: false,
+      title: '',
+      subtitle: '',
+      ctaText: '',
+      ctaHref: '',
+      background: '',
+      image: '',
+    },
+    bestSellers: {
+      enabled: false,
+      title: '',
+      productIds: [],
+    },
+    trust: {
+      enabled: false,
+      eyebrow: '',
+      title: '',
+      subtitle: '',
+    },
+    categories: {
+      enabled: false,
+      title: '',
+    },
+    bannerTwo: {
+      enabled: false,
+      title: '',
+      subtitle: '',
+      ctaText: '',
+      ctaHref: '',
+      background: '',
+      image: '',
+    },
+    trending: {
+      enabled: false,
+      title: '',
+      productIds: [],
+    },
+  },
+  productPageConfig: {
+    detailBanner: {
+      enabled: false,
+      title: '',
+      text: '',
+      image: '',
+      linkText: '',
+      linkHref: '',
+    },
+  },
+  navItems: [],
+}
+
 export function normalizeNavItems(items?: NavItem[], categories: Category[] = defaultCategories): NavItem[] {
   const options = getNavbarPageOptions(categories)
 

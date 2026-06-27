@@ -11,7 +11,7 @@ import {
 } from 'react'
 import type { Category, Product } from '@/lib/data'
 import {
-  defaultSiteDataState,
+  emptySiteDataState,
   getNavbarPageOptions,
   normalizeNavItems,
   type HomePageConfig,
@@ -152,7 +152,7 @@ async function uploadProductPageConfigImages(config: ProductPageConfig): Promise
 }
 
 export function SiteDataProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<SiteDataState>(defaultSiteDataState)
+  const [state, setState] = useState<SiteDataState>(emptySiteDataState)
   const [hydrated, setHydrated] = useState(false)
 
   const refreshSiteData = useCallback(async () => {
